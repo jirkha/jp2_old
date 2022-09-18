@@ -17,6 +17,9 @@ def list_items(response):
     st = Storage.objects.all()
     r = Removal.objects.all()
     
+    # print("m", m)
+    # print("updated", Item.objects.values('updated'))
+    
     m_ser = MaterialSerializer(m, many=True)
     
     # return Response(
