@@ -20,12 +20,14 @@ class MaterialSerializer(ModelSerializer):
 
 
 class StorageSerializer(ModelSerializer):
+    item = MaterialSerializer(many=False, read_only=True)
     class Meta:
         model = Storage
         fields = '__all__'
 
 
 class RemovalSerializer(ModelSerializer):
+    item = MaterialSerializer(many=False, read_only=True)
     class Meta:
         model = Removal
         fields = '__all__'
