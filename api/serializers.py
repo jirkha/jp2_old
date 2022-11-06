@@ -1,14 +1,23 @@
 from dataclasses import fields
 from pyexpat import model
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import ModelSerializer, SerializerMethodField
+from rest_framework import serializers
 
 from . models import ItemType, Item, ItemPart, Storage, Removal
 from . models import ProductType, Product, SaleType, Sale, Transaction
 
 class MaterialTypeSerializer(ModelSerializer):
+    ### pole "material_count" vložené nad rámec polí daných modelem ItemType propojené s fcí "get_material_count" níže
+    material_count = SerializerMethodField(read_only=True)
     class Meta:
         model = ItemType
         fields = '__all__'
+    
+    ### tato funkce spočítá počet položek Items přiřazených k danému ItemType a vloží ho do pole "material_count"
+    def get_material_count(self, obj):
+        ### "types" je "related_name" Foreign key pole "type" modelu Item
+        count = obj.types.count()
+        return count
 
 
 class MaterialSerializer(ModelSerializer):
@@ -71,9 +80,14 @@ class SaleSerializer(ModelSerializer):
 
 
 class TransactionSerializer(ModelSerializer):
-    sale = SaleSerializer(many=False, read_only=True)
+    sales_channel = SaleSerializer(many=False, read_only=True)
     product = ProductSerializer(many=False, read_only=True)
 
     class Meta:
         model = Transaction
         fields = '__all__'
+
+
+class DailySalesSerializer(serializers.Serializer):
+   day = serializers.DateField()
+   sales = serializers.IntegerField()

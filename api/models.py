@@ -6,6 +6,8 @@ from django.db import models
 class ItemType(models.Model):  # typ materiálu
     # název typu suroviny (vůně, sklenice, vosk atd.)
     name = models.CharField(max_length=256)
+    note = models.TextField(blank=True, default="")  # popis
+    updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -18,7 +20,7 @@ class Item(models.Model):  # položka (součást) produktu
     name = models.CharField(max_length=256, blank=False)  # název položky
     ### typ suroviny (položky) 
     type = models.ForeignKey(
-        ItemType, related_name="types", on_delete=models.CASCADE)
+        ItemType, related_name="types", on_delete=models.RESTRICT)
     ### měrná jednotka (výběr z možností)
     unit = models.CharField(
         max_length=256,
@@ -122,6 +124,9 @@ class ProductType(models.Model):  # typ produktu
     # automaticky doplní čas přidání typu produktu
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ["name"]
 
     def __str__(self):
         return f"{self.name}"
@@ -131,7 +136,7 @@ class Product(models.Model):  # prudukt (výrobek k prodeji)
     name = models.CharField(max_length=256)  # název produktu
     # typ produktu (svíčka / vonný vosk / difuzér atd.)
     product_type = models.ForeignKey(
-        ProductType, related_name="product_types", on_delete=models.CASCADE)  # volba tyupu produktu
+        ProductType, related_name="product_types", on_delete=models.RESTRICT)  # volba tyupu produktu
     # součásti daného produktu
     items = models.ManyToManyField(
         ItemPart, related_name="product_items", blank=True)
@@ -139,10 +144,12 @@ class Product(models.Model):  # prudukt (výrobek k prodeji)
     costs = models.PositiveIntegerField(default=0)
     # prodejní cena
     price = models.PositiveIntegerField(default=0)
-    # naskladněné (vyrobené) množství
-    stocked = models.PositiveIntegerField(default=0)
+    # vyrobené množství
+    made = models.PositiveIntegerField(default=0)
+    # množství skladem (počítá se automaticky)
+    stocked = models.IntegerField(default=0)
     # prodané množství (nezadává se při tvorbě produktu, ale automaticky při transakci)
-    sold = models.PositiveIntegerField(default=0)
+    sold = models.IntegerField(default=0)
     ### uvádí postup/technologii výroby (např. recept)
     procedure = models.TextField(blank=True)
     # uvádí (a/n), zda se jedná o výrobek pod značkou J&P CANDLES nebo pod jinou značkou (externí spolupráce)
@@ -174,7 +181,7 @@ class Sale(models.Model):  # typ prodejního kanálu
     # např. název konkrétního trhu, název obchodu kde byla svíčka prodána, eshop atd.
     name = models.CharField(max_length=256)
     type = models.ForeignKey(
-        SaleType, related_name="sale_types", on_delete=models.CASCADE)  # volba typu prodejního kanálu
+        SaleType, related_name="sale_types", on_delete=models.RESTRICT)  # volba typu prodejního kanálu
     # uvádí (a/n), zda se jedná o prodejní kanál pod značkou JPcandles nebo pro výrobu pod jinou značkou (externí spolupráce)
     brand = models.BooleanField(default=True)
     note = models.TextField(blank=True)  # poznámka
@@ -194,13 +201,13 @@ class Transaction(models.Model):  # transakce
         Product, related_name="products", on_delete=models.CASCADE)  # prodaný produkt
     # uvádí případný příznak změny ceny oproti přednastavené u daného výrobku (sleva/navýšení)
     discount_increase = models.CharField(max_length=56, default="")
-    # uvádí případnou částku, o kterou se snižije/zvyšuje standardní cena (navýšení/snížení dle příznaku "discount_increase")
-    difference_price = models.IntegerField(blank=True, default=0)
     # prodejní cena za 1 ks / produkt (vloží vždy aktuální cenu nastavenou u atributu "price" v modelu Product)
-    product_price = models.PositiveIntegerField(default=0)
+    standard_price = models.PositiveIntegerField(default=0)
+    # spočítá cenu za 1 ks prodaného produktu po ode/přičtení slevy/navýšení
+    real_price = models.PositiveIntegerField(default=0)
     quantity_of_product = models.PositiveIntegerField()  # množství prodaného produktu
     # automaticky spočítá celkovou cenu transakce
-    total_price = models.IntegerField(blank=True)
+    sum = models.IntegerField(blank=True)
     note = models.TextField(blank=True)  # poznámka
     # automaticky doplní čas přidání transakce
     updated = models.DateTimeField(auto_now=True)

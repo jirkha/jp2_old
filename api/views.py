@@ -1,4 +1,5 @@
 from urllib import request
+from django.http import HttpResponseBadRequest
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -21,6 +22,7 @@ def itemType_add(request):
     print(data)
     item = ItemType.objects.create(
         name=data['name'],
+        note=data['note'],
     )
     i_ser = MaterialTypeSerializer(item, many=False)
 
@@ -70,15 +72,15 @@ def list_items(response):
                 ### pokud je vyskladněného materiálu více než naskladněného (tzn. chybně zadáno), uloží 0
                 if unstor1 > stor1:
                     it1.quantity_of_material = 0
-                    it1.save()
+                    it1.save(update_fields=["quantity_of_material"])
                 ### od naskladněného počtu odečte vyskladněný a uloží
                 else:
                     it1.quantity_of_material = stor1 - unstor1
-                    it1.save()
+                    it1.save(update_fields=["quantity_of_material"])
             else:
                 ### k danému atributu "quantity_of_material" daného item přiřadí počet naskladněných ks a uloží ho
                 it1.quantity_of_material = stor1
-                it1.save()
+                it1.save(update_fields=["quantity_of_material"])
                 
     
     m_ser = MaterialSerializer(m, many=True)
@@ -137,12 +139,33 @@ def item_update(response, pk):
     return Response(m_ser.data)
 
 
+@api_view(['PUT'])
+def itemType_update(response, pk):
+    data = response.data
+    print(data)
+    itemType = ItemType.objects.get(id=pk)
+
+    itemType.name = data['name']
+    itemType.note = data['note']
+    itemType.save()
+    
+    m_ser = MaterialTypeSerializer(itemType)
+    return Response(m_ser.data)
+
+
 @csrf_exempt
 @api_view(['DELETE'])
 def item_delete(response, pk):
     item = Item.objects.get(id=pk)
     item.delete()
+    return Response('Položka byla vymazána')
 
+
+@csrf_exempt
+@api_view(['DELETE'])
+def itemType_delete(response, pk):
+    itemType = ItemType.objects.get(id=pk)
+    itemType.delete()
     return Response('Položka byla vymazána')
 
 
@@ -238,7 +261,8 @@ def removal_add(request):
     print("item_store", item_store)
     ### zjistí, zda není zadán požadavek an vyskladnění většího množství materiálu než je naskladněné množství
     if item_store < int(data['quantity_of_material']):
-        raise ValueError("Neplatné množství vyskladňovaného zboží")
+        #raise ValueError("Neplatné množství vyskladňovaného zboží")
+        return HttpResponseBadRequest("Neplatné množství vyskladňovaného zboží")
     else:
         removal = Removal.objects.create(
             day_of_removal=data['day_of_removal'],
@@ -301,14 +325,13 @@ def product_add(request):
     product = Product.objects.create(
         name=data['name'],
         product_type=ProductType.objects.get(id=data['product_type']),
-        #costs=data['costs'], SPOČÍTAT FUNKCÍ
         price=data['price'],
-        stocked=data['stocked'],
-        #sold = SPOČÍTAT FUNKCÍ
+        made=data['made'],
         procedure=data['procedure'],
         brand=data['brand'],
         note=data['note']
     )
+    
     ### postupně vkládá všechny item k příslušnému výrobku
     # for item in items:
     #     product.items.add(item)
@@ -332,12 +355,34 @@ def product_item_patch(response, pk):
     
     ### další část kódu navýší výrobní náklady u daného produktu o množství právě vkládaného materiálu
     ### vyhledá cenu vkládaného materiálu a vynásobí ji množstvím materiálu v daném produktu
-    item_costs = int(Item.objects.get(id=data['item']).costs) * int(data['quantity'])
+    item_costs = int(Item.objects.get(id=data['item']).costs) * float(data['quantity'])
     ### přičte náklady za vkládaný materiál k celkovým výrobním nákladům daného produktu
     product.costs = product.costs + item_costs
     ### aktualizuje pouze pole "costs" u daného produktu
     product.save(update_fields=["costs"])
     
+    return Response(p_ser.data)
+
+
+### upraví vyrobené množství daného produktu
+@api_view(['PATCH'])
+def product_made_patch(response, pk):
+    data = response.data
+    print(data)
+    product = Product.objects.get(id=pk)
+    
+    ### přičte/odečte množství vyrobeného produktu
+    if data['variant'] == "+":
+        product.made += int(data['made'])
+        product.stocked += int(data['made'])
+    if data['variant'] == "-":
+        product.made -= int(data['made'])
+        product.stocked -= int(data['made'])
+    
+    ### aktualizuje pole "costs" a "stocked" u daného produktu
+    product.save(update_fields=["made", "stocked"])
+    
+    p_ser = ProductSerializer(product)
     return Response(p_ser.data)
 
 
@@ -360,6 +405,32 @@ def product_item_delete(response, pk):
 def list_product(response):
     p = Product.objects.all()
     p_ser = ProductSerializer(p, many=True)
+    
+    ### vypočte, kolik bylo prodáno ks jednotlivých výrobků (z uskutečněných transakcí) a kolik jich je aktuálně skladem ###
+    id_p = Product.objects.values('id')
+    ### prochází jednotlivé výrobky dle "id"
+    for product in id_p:
+        # print("id_p:", id_p)
+        # print("product['id']:", product['id'])
+        ### najde produkt, který je aktuálně součástí daného cyklu "for product in id_p"
+        pr1 = Product.objects.get(id=product['id'])
+        ### do pole "made" daného produktu uloží vyrobené množství
+        pr1.stocked = pr1.made
+        ### z trasakcí seskupených dle "id" prodaného výrobku vypočte celkový počet prodaných ks daného výrobku
+        y = Transaction.objects.filter(product__id=product['id']).values(
+            'product').annotate(sum=Sum('quantity_of_product')).values('sum')
+        ### iterace "if" pokračuje, pokud je k danému produktu přiřazena transakce
+        if len(y) > 0:
+            for z in y:            
+                ### k danému atributu "sold" daného produktu přiřadí počet prodaných ks a uloží ho
+                pr1.sold = z['sum']
+                ### od vyrobeného množství daného výrobku odečte prodané množství =>výsledkem je množství skladem
+                pr1.stocked = pr1.made - z['sum']
+                pr1.save(update_fields=["sold", "stocked"])
+        ### větev "else" je pro případ, kdy k danému produktu není přiřazena žádná transakce a pouze se uloží množství skladem
+        else:
+            pr1.save(update_fields=["stocked"])
+            
     return Response(p_ser.data)
 
 
@@ -379,7 +450,7 @@ def product_update(response, pk):
     product.product_type = ProductType.objects.get(id=data['product_type'])
     #product.items = Item.objects.get(id=data['type'])
     product.price = data['price']
-    product.stocked = data['stocked']
+    product.made = data['made']
     product.procedure = data['procedure']
     product.brand = data['brand']
     product.note = data['note']
@@ -477,14 +548,35 @@ def sale_delete(response, pk):
 def transaction_add(request):
     data = request.data
     print("transaction_add:",data)
+    product = Product.objects.get(id=data['product'])
+    standard_price = product.price
+    
+    if product.stocked < int(data['quantity_of_product']):
+        return HttpResponseBadRequest("Nedostatek naskladněného produktu pro provedení transakce")
+    
+    if data['price_variant'] == "%":
+        difference_price = int(data['difference_price']) * 0.01 * standard_price
+    else:
+        difference_price = int(data['difference_price'])
+    
+    if data['discount_increase'] == "-":
+        real_price = standard_price - difference_price
+    elif data['discount_increase'] == "+":
+        real_price = standard_price + difference_price
+    else:
+        real_price = standard_price
+    
+    sum = int(data['quantity_of_product']) * real_price
+    
     transaction = Transaction.objects.create(
         day_of_sale=data['day_of_sale'],
-        # product_type=ProductType.objects.get(id=data['productType']),
-        sales_channel=data['sales_channel'],
-        product=data['product'],
-        discount=data['discount'],
-        #product_price=data['product_price'], SPOČÍTAT FUNKCÍ
+        sales_channel=Sale.objects.get(id=data['sales_channel']),
+        product=product,
+        discount_increase=data['discount_increase'],
+        standard_price=standard_price,
+        real_price=real_price,
         quantity_of_product=data['quantity_of_product'],
+        sum=sum,
         note=data['note'],
     )
     t_ser = TransactionSerializer(transaction, many=False)

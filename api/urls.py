@@ -1,20 +1,29 @@
 from django.urls import path
-from . import views
+from . import views, views_statistic
 from . views import ItemTypeView, ItemView
+from . views_statistic import DailySalesView
 
 urlpatterns = [
     path('list_items/', views.list_items, name='list_items'),
-    path('itemType_add/', views.itemType_add, name='itemType_add'),
-    path('item_add/', views.item_add, name='item_add'),
-    path('item_update/<str:pk>/',
-         views.item_update, name='item_update'),
-    
-    path('item_detail/<str:pk>/', views.item_detail, name='item_detail'), 
-    path('item_delete/<str:pk>/', views.item_delete, name='item_delete'),
     path('item_types/',
          ItemTypeView.as_view(), name='item_types'),
     path('items/',
          ItemView.as_view(), name='items'),
+    
+    path('item_detail/<str:pk>/', views.item_detail, name='item_detail'),
+    
+    path('itemType_add/', views.itemType_add, name='itemType_add'),
+    path('item_add/', views.item_add, name='item_add'),
+    
+    path('item_update/<str:pk>/',
+         views.item_update, name='item_update'),
+    path('itemType_update/<str:pk>/',
+         views.itemType_update, name='itemType_update'),
+        
+    path('item_delete/<str:pk>/', views.item_delete, name='item_delete'),
+    path('itemType_delete/<str:pk>',
+         views.itemType_delete, name='itemType_delete'),
+    
     
     path('list_storage/', views.list_storage, name='list_storage'),
     path('list_removal/', views.list_removal, name='list_removal'),
@@ -47,6 +56,8 @@ urlpatterns = [
          views.product_update, name='product_update'),
     path('product_item_patch/<str:pk>',
          views.product_item_patch, name='product_item_patch'),
+    path('product_made_patch/<str:pk>',
+         views.product_made_patch, name='product_made_patch'),
     path('sale_update/<str:pk>',
          views.sale_update, name='sale_update'),
     path('transaction_update/<str:pk>',
@@ -60,6 +71,8 @@ urlpatterns = [
          views.sale_delete, name='sale_delete'),
     path('transaction_delete/<str:pk>/',
          views.transaction_delete, name='transaction_delete'),
+    path('daily_sales/',
+         DailySalesView.as_view(), name='daily_sales'),
 ]
 
 
