@@ -32,6 +32,8 @@ class Item(models.Model):  # položka (součást) produktu
     ### celkové množství materiálu (nezadává se - počítá se automaticky dle na/vy-skladnění!)
     quantity_of_material = models.IntegerField(
         default=0, blank=True)
+    ### celková hodnota skladové zásoby daného materiálu, spočítá se automaticky
+    value = models.PositiveIntegerField(default=0)
     ### dodavatel dané součásti produktu (firma od které kupuji danou součást)
     supplier = models.CharField(max_length=256, blank=True)
     ### odkaz na web výrobce/dodavatele dané součásti produktu
@@ -43,6 +45,7 @@ class Item(models.Model):  # položka (součást) produktu
     def __str__(self):
         # return f"NÁZEV PRODUKTU: {self.name}, DRUH ZBOŽÍ: {self.type}"
         return f"{self.name} ({self.type})"
+
     
     
 class ItemPart(models.Model):
@@ -182,6 +185,8 @@ class Sale(models.Model):  # typ prodejního kanálu
     name = models.CharField(max_length=256)
     type = models.ForeignKey(
         SaleType, related_name="sale_types", on_delete=models.RESTRICT)  # volba typu prodejního kanálu
+    # počítá se automaticky z celkové utržené částky v rámci daného prodejního kanálu
+    amount = models.IntegerField(default=0, blank=True)
     # uvádí (a/n), zda se jedná o prodejní kanál pod značkou JPcandles nebo pro výrobu pod jinou značkou (externí spolupráce)
     brand = models.BooleanField(default=True)
     note = models.TextField(blank=True)  # poznámka
@@ -207,7 +212,9 @@ class Transaction(models.Model):  # transakce
     real_price = models.PositiveIntegerField(default=0)
     quantity_of_product = models.PositiveIntegerField()  # množství prodaného produktu
     # automaticky spočítá celkovou cenu transakce
-    sum = models.IntegerField(blank=True)
+    sum_sales = models.IntegerField(blank=True)
+    # uvádí (a/n), zda se jedná o transakci pod značkou JPcandles
+    brand = models.BooleanField(default=True)
     note = models.TextField(blank=True)  # poznámka
     # automaticky doplní čas přidání transakce
     updated = models.DateTimeField(auto_now=True)

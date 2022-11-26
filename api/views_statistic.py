@@ -1,9 +1,16 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
+from django.db.models import Sum
+import datetime
 
 from api.models import Transaction
 from api.serializers import DailySalesSerializer
+
+from .utils import (
+    sales_counter,
+    date_checker
+)
 
 
 class DailySalesView(APIView):
@@ -11,40 +18,43 @@ class DailySalesView(APIView):
     def get(self, request):
         ### další část kód slouží k výpočtu tržeb po jednotlivých dnech ###
         # uloží unikátní dny, ve kterých se uskutečnila transakce (class Transaction)
-        q = Transaction.objects.values('day_of_sale').distinct()
-        #print(q)
-        #global tt
-        lst = []
-        temp1 = 0
-        # total = 0
-        for date in q:  # prochází postupně všechny dny, kdy se uskutečnila transakce
-                # uloží konkrétní den dané iterace cyklu "for"
-                t1 = Transaction.objects.filter(day_of_sale=date["day_of_sale"])
-                #print(t1)
-                #print(len(t1))
-                temp = 0
-                for x in range(len(t1)):  # prochází postupně všechny transakce daného dne
-                    #print(x)
-                    # uloží utrženou částku za danou transakci
-                    temp += (t1[x]).sum
-                    #print(temp)
-
-                ### We can use (*) operator to get all the values of the dictionary in a list
-                # uloží hodnotu data aktuální iterace (* a fce values slouží k očištění daného data, aby nebylo zabaleno v listu a dalo se dále uložit)
-                temp_value = [*(q[temp1]).values()][0]
-                print("temp_value", temp_value)
-                # přidá do dočasného listu datum z temp_value spolu s utrženou částkou v daném dni (fce"extend" je alternativou k "append" a slouží k vložení více hodnot do listu najdednou)
-                dict = {"day": temp_value, "sales": temp}
-                lst.append(dict)
-                # vloží hodnoty z dočasného listu "lst" do finálního souhrnného listu "tt", který obsahuje všechny potřebného hodnoty pro výpis tržeb
-                # total += temp  # počítá celkovou utrženou částku za všechny transakce
-                temp1 += 1
-                dict = {}
-
-            #tt.sort()  # seřadí list podle datumů vzestupně
+        q = Transaction.objects.values('day_of_sale').distinct().order_by(
+            "-day_of_sale")
+        ### funkce sales_counter umístěná v utils.py vytvoří list se seznamen dnů s uskutečněnou transakcí a celkovou utrženou částkou
+        
+        qm = Transaction.objects.values(
+            'day_of_sale__year', 'day_of_sale__month').annotate(amount=Sum('sum_sales'))
+        qy = Transaction.objects.values(
+            'day_of_sale__year').annotate(amount=Sum('sum_sales'))
+        print("qm", qm)
+        print("qy", qy)
+        
+        lst = sales_counter(q)
+        
         print("lst", lst)
+        # if response.method == "POST":
+        #     lst = filter(
+        #         lambda date: date["day"] <= response.data['day_to'], lst)
+        #     lst = filter(
+        #         lambda date: date["day"] >= response.data['day_from'], lst)
+        #     print("filtered", list(lst))
+        
+        
         
         results = DailySalesSerializer(lst, many=True).data
         return Response(results)
+    
+    def post(self, request):
+        ### fce "date_checker" zkontroluje, zda byl vyplněn datum a pokud nikoliv, vloží defaultní hodnotu
+        dates = date_checker(request.data['day_from'], request.data['day_to'])
+        ### v dates je uložen výsledný list [day_from, day_to]
 
-
+        ### uloží všechny dny, ve kterých se uskutečnila transakce a vyfiltruje je na základě API dat
+        q = Transaction.objects.values('day_of_sale').distinct().filter(
+            day_of_sale__lte=dates[1], day_of_sale__gte=dates[0]).order_by(
+                "-day_of_sale")
+        ### funkce sales_counter umístěná v utils.py vytvoří list se seznamen vyfiltrovaných dnů s uskutečněnou transakcí a celkovou utrženou částkou
+        lst = sales_counter(q)
+        print(lst)
+        results = DailySalesSerializer(lst, many=True).data
+        return Response(results)
