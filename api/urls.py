@@ -1,7 +1,9 @@
 from django.urls import path
+from django.conf import settings
+
 from . import views, views_statistic
-from . views import ItemTypeView, ItemView
-from . views_statistic import DailySalesView
+from . views import ItemTypeView, ItemView, ProductView
+from . views_statistic import DailySalesView, MonthlySalesView, YearlySalesView
 
 urlpatterns = [
     path('list_items/', views.list_items, name='list_items'),
@@ -32,9 +34,11 @@ urlpatterns = [
     path('storage_delete/<str:pk>/', views.storage_delete, name='storage_delete'),
     path('removal_delete/<str:pk>/', views.removal_delete, name='removal_delete'),
 
-
+    path('posts/', views.ProductView.as_view(), name='posts_list'),
+    path('posts/<str:pk>/', views.ProductView.as_view(), name='posts_list'),
+     
     path('productType_add/', views.productType_add, name='productType_add'),
-    path('product_add/', views.product_add, name='product_add'),
+#     path('product_add/', views.product_add, name='product_add'),
     path('saleType_add/', views.saleType_add, name='saleType_add'),
     path('sale_add/', views.sale_add, name='sale_add'),
     path('transaction_add/', views.transaction_add, name='transaction_add'),
@@ -52,14 +56,16 @@ urlpatterns = [
     path('transaction_detail/<str:pk>/',
          views.transaction_detail, name='transaction_detail'),
     
-    path('product_update/<str:pk>/',
-         views.product_update, name='product_update'),
+#     path('product_update/<str:pk>/',
+#          views.product_update, name='product_update'),
     path('productType_update/<str:pk>/',
          views.productType_update, name='productType_update'),
     path('product_item_patch/<str:pk>',
          views.product_item_patch, name='product_item_patch'),
     path('product_made_patch/<str:pk>',
          views.product_made_patch, name='product_made_patch'),
+    path('product_image_patch/<str:pk>',
+         views.product_image_patch, name='product_image_patch'),
     path('sale_update/<str:pk>/',
          views.sale_update, name='sale_update'),
     path('saleType_update/<str:pk>/',
@@ -79,8 +85,13 @@ urlpatterns = [
          views.saleType_delete, name='saleType_delete'),
     path('transaction_delete/<str:pk>/',
          views.transaction_delete, name='transaction_delete'),
+    
+    
     path('daily_sales/',
          DailySalesView.as_view(), name='daily_sales'),
+    path('monthly_sales/',
+         MonthlySalesView.as_view(), name='monthly_sales'),
+    path('yearly_sales/',
+         YearlySalesView.as_view(), name='yearly_sales'),
 ]
-
-
+#+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

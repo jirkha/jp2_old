@@ -1,5 +1,5 @@
 import datetime
-from api.models import Transaction
+from api.models import Transaction, Product
 
 def sales_counter(q):
     lst = []
@@ -16,7 +16,7 @@ def sales_counter(q):
         temp_value = [*(q[temp1]).values()][0]
         # print("temp_value", temp_value)
         ### přidá do dočasného listu datum z temp_value spolu s utrženou částkou v daném dni (fce"extend" je alternativou k "append" a slouží k vložení více hodnot do listu najdednou)
-        dict = {"day": temp_value, "sales": temp}
+        dict = {"day": temp_value, "tržby": temp}
         lst.append(dict)
         ### vloží hodnoty z dočasného listu "lst" do finálního souhrnného listu "tt", který obsahuje všechny potřebného hodnoty pro výpis tržeb
         ### total += temp  # počítá celkovou utrženou částku za všechny transakce
@@ -35,3 +35,18 @@ def date_checker(since, to):
     else:
         day_to = to
     return [day_from, day_to]
+
+
+def product_of_transaction(transaction_list):
+    ### do serializeru konkrétního prodejního kanálu přidá pole "pruduct_name", které umožní zobrazit produkt prodaný v rámci dané transakce u prodejního kanálu
+    for transaction in transaction_list:
+        ### prochází všechny transakce uskutečněné v rámci daného prodejního kanálu
+        #print("transaction", transaction)
+        product_id = transaction['product_id']
+        #print('product_id', product_id)
+        product = Product.objects.get(id=product_id).name
+        print("product", product)
+        ### přidá novou položku "product_name" do seznamu
+        transaction['product_name'] = product
+        
+    return transaction_list

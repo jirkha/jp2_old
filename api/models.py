@@ -135,6 +135,9 @@ class ProductType(models.Model):  # typ produktu
         return f"{self.name}"
 
 
+def upload_to(instance, filename):
+    return 'images/{filename}'.format(filename=filename)
+
 class Product(models.Model):  # prudukt (výrobek k prodeji)
     name = models.CharField(max_length=256)  # název produktu
     # typ produktu (svíčka / vonný vosk / difuzér atd.)
@@ -143,6 +146,10 @@ class Product(models.Model):  # prudukt (výrobek k prodeji)
     # součásti daného produktu
     items = models.ManyToManyField(
         ItemPart, related_name="product_items", blank=True)
+    # fotografie produktu
+    image = models.ImageField(
+        upload_to="post_images", 
+        null=True, blank=True, default=None)
     # výrobní náklady, které se spočítají automaticky na základě položek "items"
     costs = models.PositiveIntegerField(default=0)
     # prodejní cena

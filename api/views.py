@@ -6,6 +6,8 @@ from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Sum
+from rest_framework import status
+from rest_framework.parsers import MultiPartParser, FormParser
 
 from . models import ItemType, Item, ItemPart, Storage, Removal
 from . models import ProductType, Product, SaleType, Sale, Transaction
@@ -324,29 +326,114 @@ def list_productType(response):
     return Response(pt_ser.data)
 
 
-@api_view(['POST'])
-def product_add(request):
-    data = request.data
-    print("product_add: ",data)
-    ### přiřadí id "items" obsažených v daném výrobku k příslušnému objektu "item"
-    #items = ([ItemPart.objects.get(id=id) for id in data['items']])
-    product = Product.objects.create(
-        name=data['name'],
-        product_type=ProductType.objects.get(id=data['product_type']),
-        price=data['price'],
-        made=data['made'],
-        procedure=data['procedure'],
-        brand=data['brand'],
-        note=data['note']
-    )
-    
-    ### postupně vkládá všechny item k příslušnému výrobku
-    # for item in items:
-    #     product.items.add(item)
-    p_ser = ProductSerializer(product, many=False)
-    print("p_ser: ", p_ser)
+# @api_view(['PUT'])
+# def product_update(response, pk):
+#     data = response.data
+#     print(data)
+#     product = Product.objects.get(id=pk)
 
-    return Response(p_ser.data)
+#     product.name = data['name']
+#     product.product_type = ProductType.objects.get(id=data['product_type'])
+#     #product.items = Item.objects.get(id=data['type'])
+#     product.image = data['image']
+#     product.price = data['price']
+#     product.made = data['made']
+#     product.procedure = data['procedure']
+#     product.brand = data['brand']
+#     product.note = data['note']
+
+#     product.save()
+
+#     p_ser = ProductSerializer(product)
+#     return Response(p_ser.data)
+
+class ProductView(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+    def post(self, request, *args, **kwargs):
+        data = request.data
+        if data['brand'] == "true":
+            brand = True
+        if data['brand'] == "false":
+            brand = False
+        product = Product.objects.create(
+            name=data['name'],
+            product_type=ProductType.objects.get(id=data['product_type']),
+            image=data['image'],
+            price=data['price'],
+            made=data['made'],
+            procedure=data['procedure'],
+            brand=brand,
+            note=data['note']
+        )
+        posts_serializer = ProductSerializer(product, many=False)
+        return Response(posts_serializer.data)
+    
+        # if posts_serializer.is_valid():
+        #     posts_serializer.save()
+        #     return Response(posts_serializer.data, status=status.HTTP_201_CREATED)
+        # else:
+        #     print('error', posts_serializer.errors)
+        #     return Response(posts_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def put(self, request, pk, *args, **kwargs):
+        data = request.data
+        print("data", data)
+        #print("data['brand']", data['brand'])
+        if data['brand'] == "true":
+            brand = True
+        if data['brand'] == "false":
+            brand = False
+        product = Product.objects.get(id=pk)
+
+        product.name = data['name']
+        product.product_type = ProductType.objects.get(id=data['product_type'])
+        #product.items = Item.objects.get(id=data['type'])
+        # print("   product.image:", product.image)
+        # print("   data['image'][6:]:", str(data['image'])[7:])
+        
+        ### zkontroluje, zda byl změne obrázek oproti původnímu
+        ### pokud ne, obrázek ponechá; pokud ano, změní ho
+        ### pokud by toto ověření nebylo, vždy se přidá "/media/" a obrázek se nebude zobrazovat korektně
+        if str(product.image) != str(data['image'])[7:]:
+            product.image = data['image']
+        
+        product.price = data['price']
+        product.made = data['made']
+        product.procedure = data['procedure']
+        product.brand = brand
+        product.note = data['note']
+
+        product.save()
+        # posts_serializer = ProductSerializer(product, many=False)
+        p_ser = ProductSerializer(product)        
+        # print("   posts_serializer.data: ", posts_serializer.data)
+        # print("   p_ser.data: ", p_ser.data)
+        return Response(p_ser.data)
+        # return Response(posts_serializer.data)
+    
+# @api_view(['POST'])
+# def product_add(request):
+#     data = request.data
+#     print("product_add: ",data)
+#     ### přiřadí id "items" obsažených v daném výrobku k příslušnému objektu "item"
+#     #items = ([ItemPart.objects.get(id=id) for id in data['items']])
+#     product = Product.objects.create(
+#         name=data['name'],
+#         product_type=ProductType.objects.get(id=data['product_type']),
+#         image=data['image'],
+#         price=data['price'],
+#         made=data['made'],
+#         procedure=data['procedure'],
+#         brand=data['brand'],
+#         note=data['note']
+#     )
+    
+#     ### postupně vkládá všechny item k příslušnému výrobku
+#     # for item in items:
+#     #     product.items.add(item)
+#     p_ser = ProductSerializer(product, many=False)
+#     #print("p_ser: ", p_ser)
+
+#     return Response(p_ser.data)
 
 
 @api_view(['PUT'])
@@ -368,6 +455,7 @@ def productType_update(response, pk):
 def product_item_patch(response, pk):
     data = response.data
     print(data)
+    print("pk",pk)
     product = Product.objects.get(id=pk)
     ### vloží "item" vč. "quantity" k danému produktu a zároveň ho uloží jako nový objekt modelu "ItemPart"
     product.items.create(
@@ -408,6 +496,21 @@ def product_made_patch(response, pk):
     p_ser = ProductSerializer(product)
     return Response(p_ser.data)
 
+
+### upraví obrázek daného produktu
+@api_view(['PATCH'])
+def product_image_patch(response, pk):
+    parser_classes = (MultiPartParser, FormParser)
+    data = response.data
+    print(data)
+    product = Product.objects.get(id=pk)
+    product.image = data['image']
+
+    ### aktualizuje pole "costs" a "stocked" u daného produktu
+    product.save(update_fields=["image"])
+
+    p_ser = ProductSerializer(product)
+    return Response(p_ser.data)
 
 @api_view(['DELETE'])
 def product_item_delete(response, pk):
@@ -467,26 +570,6 @@ def product_detail(response, pk):
     p = Product.objects.get(id=pk)
     return Response({'p_ser': ProductSerializer(p, many=False).data})
 
-
-@api_view(['PUT'])
-def product_update(response, pk):
-    data = response.data
-    print(data)
-    product = Product.objects.get(id=pk)
-
-    product.name = data['name']
-    product.product_type = ProductType.objects.get(id=data['product_type'])
-    #product.items = Item.objects.get(id=data['type'])
-    product.price = data['price']
-    product.made = data['made']
-    product.procedure = data['procedure']
-    product.brand = data['brand']
-    product.note = data['note']
-
-    product.save()
-
-    p_ser = ProductSerializer(product)
-    return Response(p_ser.data)
 
 
 @csrf_exempt

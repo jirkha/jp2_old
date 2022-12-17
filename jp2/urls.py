@@ -16,11 +16,15 @@ Including another URLconf
 from django.contrib import admin
 from django.conf import settings
 from django.urls import path, include
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("api/", include("api.urls")),
 ]
+
+### umožní zobrazit obrázky ze složky "C:\Users\vecko\jp_2.0\jp2\media\post_images"
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:
     import debug_toolbar

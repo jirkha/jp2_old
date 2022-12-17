@@ -2,9 +2,14 @@ from dataclasses import fields
 from pyexpat import model
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
 from rest_framework import serializers
+from django.db.models import Sum
 
 from . models import ItemType, Item, ItemPart, Storage, Removal
 from . models import ProductType, Product, SaleType, Sale, Transaction
+
+from .utils import (
+    product_of_transaction
+)
 
 class MaterialTypeSerializer(ModelSerializer):
     ### pole "material_count" vložené nad rámec polí daných modelem ItemType propojené s fcí "get_material_count" níže
@@ -29,11 +34,18 @@ class MaterialSerializer(ModelSerializer):
 
 
 class ItemPartSerializer(ModelSerializer):
+    ### pole "item_price" vložené nad rámec polí daných modelem ItemPart propojené s fcí "get_item_price" níže
+    item_price = SerializerMethodField(read_only=True)
     item = MaterialSerializer(many=False, read_only=True)
 
     class Meta:
         model = ItemPart
         fields = '__all__'
+    
+    ### tato funkce spočítá celkovou cenu daného materiálu v produktu
+    def get_item_price(self, obj):
+        count = obj.item.costs * obj.quantity
+        return count
 
 
 class StorageSerializer(ModelSerializer):
@@ -67,6 +79,7 @@ class ProductTypeSerializer(ModelSerializer):
 class ProductSerializer(ModelSerializer):
     product_type = ProductTypeSerializer(many=False, read_only=True)
     items = ItemPartSerializer(many=True, read_only=True)
+    image = serializers.ImageField(required=False)
 
     class Meta:
         model = Product
@@ -88,8 +101,10 @@ class SaleTypeSerializer(ModelSerializer):
     
 
 class SaleSerializer(ModelSerializer):
-    ### pole "transaction_count" vložené nad rámec polí daných modelem Sale propojené s fcí "get_transaction_count" níže
+    ### 3 pole níže vložené nad rámec polí daných modelem Sale propojené s funkcemi níže
     transaction_count = SerializerMethodField(read_only=True)
+    transaction_list = SerializerMethodField(read_only=True)
+    years_sales = SerializerMethodField(read_only=True)
     type = SaleTypeSerializer(many=False, read_only=True)
 
     class Meta:
@@ -101,7 +116,21 @@ class SaleSerializer(ModelSerializer):
         ### "sales" je "related_name" Foreign key pole "sales_channel" modelu Transaction
         count = obj.sales.count()
         return count
-
+    
+    ### tato funkce přiřadí transakce k danému Sale a vloží je do pole "transaction_list"
+    def get_transaction_list(self, obj):
+        ### "sales" je "related_name" Foreign key pole "sales_channel" modelu Transaction
+        transaction_list = obj.sales.values()
+        ### pomocí fce "product_of_transaction" v utils.py přidá do serializeru název prodaných produktů v rámci jednotlivých transakcí
+        transaction_list = product_of_transaction(transaction_list)
+        return transaction_list
+    
+    ### tato funkce spočítá roční tržby daného Sale a vloží je do pole "years_sales"
+    def get_years_sales(self, obj):
+        ### uloží všechny roky, ve kterých se uskutečnila transakce a přiřadí k nim tržby daného prodejního kanálu
+        years_sales = Transaction.objects.filter(sales_channel_id=obj.id).values(
+            'day_of_sale__year').annotate(amount=Sum('sum_sales')).order_by('-day_of_sale__year')
+        return years_sales
 
 class TransactionSerializer(ModelSerializer):
     sales_channel = SaleSerializer(many=False, read_only=True)
@@ -114,4 +143,14 @@ class TransactionSerializer(ModelSerializer):
 
 class DailySalesSerializer(serializers.Serializer):
    day = serializers.DateField()
-   sales = serializers.IntegerField()
+   tržby = serializers.IntegerField()
+
+
+class MonthlySalesSerializer(serializers.Serializer):
+   year = serializers.IntegerField()
+   months = serializers.ListField()
+   
+class YearlySalesSerializer(serializers.Serializer):
+   id = serializers.IntegerField()
+   name = serializers.IntegerField()
+   amount = serializers.IntegerField()
