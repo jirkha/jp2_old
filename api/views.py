@@ -617,6 +617,13 @@ def sale_add(request):
         type=SaleType.objects.get(id=data['type']),
         #type=data['type'],
         brand=data['brand'],
+        route=data['route'],
+        street_number=data['street_number'],
+        city=data['city'],
+        country=data['country'],
+        postal_code=data['postal_code'],
+        ic_number=data['ic_number'],
+        link=data['link'],
         note=data['note'],
     )
     s_ser = SaleSerializer(sale, many=False)
@@ -659,6 +666,13 @@ def sale_update(response, pk):
     sale.name = data['name']
     sale.type = SaleType.objects.get(id=data['type'])
     sale.brand = data['brand']
+    sale.route = data['route']
+    sale.street_number = data['street_number']
+    sale.city = data['city']
+    sale.country = data['country']
+    sale.postal_code = data['postal_code']
+    sale.ic_number = data['ic_number']
+    sale.link = data['link']
     sale.note = data['note']
 
     sale.save()
