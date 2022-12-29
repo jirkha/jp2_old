@@ -1,1 +1,1 @@
-web: gunicorn jp2.wsgi -b :8000
+web: gunicorn jp2.wsgi --log-file - 
