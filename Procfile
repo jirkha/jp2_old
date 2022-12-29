@@ -1,1 +1,1 @@
-web: gunicorn jp2.wsgi
+web: gunicorn jp2.wsgi --log-file - 
