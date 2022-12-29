@@ -1,1 +1,1 @@
-web: gunicorn jp2.wsgi:application
+web: gunicorn jp2.wsgi
