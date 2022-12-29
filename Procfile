@@ -1,1 +1,1 @@
-web: gunicorn jp2.wsgi --log-file - 
+web: gunicorn --env DJANGO_SETTINGS_MODULE=jp2.settings jp2.wsgi
