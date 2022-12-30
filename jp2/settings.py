@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 from pathlib import Path
 from corsheaders.defaults import default_headers
 import os
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -106,7 +107,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'jp2',
         'USER': 'postgres',
-        'PASSWORD': 'automobil609906',  # 'automobil609906',
+        'PASSWORD': config('PASSWORD'),
         'HOST': 'localhost',
         'PORT': '5433'
     }
