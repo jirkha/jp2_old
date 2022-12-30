@@ -1,1 +1,1 @@
-web: gunicorn jp2.wsgi --log-file - 
+web: env\Scripts\gunicorn jp2.wsgi --log-file -
