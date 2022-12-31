@@ -44,7 +44,7 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
-    'whitenoise.runserver_nostatic',
+    #'whitenoise.runserver_nostatic',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -84,6 +84,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
+            'jp2_react/build',
             os.path.join(BASE_DIR, 'jp2_react/build'),
             os.path.join(BASE_DIR, 'jp2_react/public')
             ],
@@ -100,6 +101,8 @@ TEMPLATES = [
     },
 ]
 print("DIRS", os.path.join(BASE_DIR, 'jp2_react/build'))
+print("BASE_DIR", BASE_DIR)
+
 WSGI_APPLICATION = 'jp2.wsgi.application'
 
 # Database
