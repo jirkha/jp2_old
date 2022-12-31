@@ -84,7 +84,8 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            os.path.join(BASE_DIR, 'jp2_react/build')
+            #os.path.join(BASE_DIR, 'jp2_react/build'),
+            os.path.join(BASE_DIR, 'jp2_react/public')
             ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -98,7 +99,7 @@ TEMPLATES = [
         },
     },
 ]
-
+print("DIRS", os.path.join(BASE_DIR, 'jp2_react/build'))
 WSGI_APPLICATION = 'jp2.wsgi.application'
 
 # Database
@@ -157,7 +158,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 # PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
-# print("PROJECT_ROOT", PROJECT_ROOT)
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 #STATIC_URL = '/static/'
