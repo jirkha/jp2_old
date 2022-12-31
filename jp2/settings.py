@@ -161,7 +161,8 @@ MEDIA_URL = '/media/'
 
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
-    BASE_DIR / 'jp2_react/build/static'
+    BASE_DIR / 'jp2_react/build/static',
+    '/tmp/build_0a6f5336/jp2_react/build/static'
 ]
 
 # Default primary key field type
