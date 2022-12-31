@@ -18,6 +18,7 @@ import django_heroku
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+SETTINGS_PATH = os.path.dirname(os.path.dirname(__file__))
 
 # # Actual directory user files go to
 # MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'mediafiles')
@@ -80,13 +81,14 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'jp2.urls'
 
+
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            'jp2_react/build',
             os.path.join(BASE_DIR, 'jp2_react/build'),
-            os.path.join(BASE_DIR, 'jp2_react/public')
+            # os.path.join(BASE_DIR, 'jp2_react/public')
             ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -100,8 +102,9 @@ TEMPLATES = [
         },
     },
 ]
-print("DIRS", os.path.join(BASE_DIR, 'jp2_react/build'))
-print("BASE_DIR", BASE_DIR)
+# print("DIRS", os.path.join(BASE_DIR, 'jp2_react/build'))
+# print("SETTINGS_PATH", SETTINGS_PATH)
+# print("BASE_DIR", BASE_DIR)
 
 WSGI_APPLICATION = 'jp2.wsgi.application'
 
