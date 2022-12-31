@@ -155,6 +155,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
+# PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+# print("PROJECT_ROOT", PROJECT_ROOT)
+# STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
+
 STATIC_URL = '/static/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
@@ -162,7 +166,7 @@ MEDIA_URL = '/media/'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
     BASE_DIR / 'jp2_react/build/static',
-    '/tmp/build_0a6f5336/jp2_react/build/static'
+    # os.path.join(PROJECT_ROOT, 'static'),
 ]
 
 # Default primary key field type
