@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 """Django's command-line utility for administrative tasks."""
+from django.core.management.commands.runserver import Command as runserver
 import os
 import sys
+from decouple import config
 
 
 def main():
@@ -17,6 +19,8 @@ def main():
         ) from exc
     execute_from_command_line(sys.argv)
 
+
+runserver.default_port = config('PORT')
 
 if __name__ == '__main__':
     main()
