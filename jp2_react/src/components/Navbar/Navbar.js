@@ -231,6 +231,8 @@ export default function NavbarJP() {
                 variant="button"
                 underline="none"
                 href={item.href}
+                component="button"
+                onClick={() => navigate(item.href)}
               >
                 {item.name}
               </Link>
