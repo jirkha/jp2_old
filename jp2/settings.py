@@ -118,22 +118,22 @@ WSGI_APPLICATION = 'jp2.wsgi.application'
 #         'PORT': '5432'
 #     }
 # }
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
 DATABASES = {
     'default': {
-        'DATABASE_URL': config('PASSWORD'),
-        'PGDATABASE': config('PGDATABASE'),
-        'PGHOST': config('PGHOST'),
-        'PGPASSWORD': config('PGPASSWORD'),
-        'PGPORT': config('PGPORT'),
-        'PGUSER': config('PGUSER'),
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+# DATABASES = {
+#     'default': {
+#         'DATABASE_URL': config('PASSWORD'),
+#         'PGDATABASE': config('PGDATABASE'),
+#         'PGHOST': config('PGHOST'),
+#         'PGPASSWORD': config('PGPASSWORD'),
+#         'PGPORT': config('PGPORT'),
+#         'PGUSER': config('PGUSER'),
+#     }
+# }
 
 
 # Password validation
