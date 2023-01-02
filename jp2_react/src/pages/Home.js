@@ -12,7 +12,7 @@ export default function Home() {
         //align="center" //zarovná doprostřed
         gutterBottom //vytvoří mezeru pod textem
       >
-        Firemní systém J&P CANDLES developer
+        Firemní systém J&P CANDLES
       </Typography>
       <img src={img} width="390" height="285" alt="img" />
     </div>
