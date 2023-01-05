@@ -49,6 +49,7 @@ const { isAuthenticated, isLoading } = useAuth0();
       <div>
         {" "}
         <NavbarJP />
+        {"Loading "}
       </div>
     );
   }
@@ -58,7 +59,7 @@ const { isAuthenticated, isLoading } = useAuth0();
       <div>
         <img src={logo} width="270" height="65" alt="Logo" />
         <Typography variant="h4" color="primary" sx={{ mt: 2, mb: 2 }}>
-          Pro pokračování se prosím přihlašte
+          Pro pokračování se prosím tlačítkem přihlašte
         </Typography>
         <LoginButton />
       </div>
