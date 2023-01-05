@@ -49,6 +49,7 @@ const { isAuthenticated, isLoading } = useAuth0();
       <div>
         {" "}
         <NavbarJP />
+        {" Loading... "}
       </div>
     );
   }
