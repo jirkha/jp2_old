@@ -127,7 +127,7 @@ WSGI_APPLICATION = 'jp2.wsgi.application'
 # }
 DATABASES = {
     'default': {
-        'DATABASE_URL': config('PASSWORD'),
+        'DATABASE_URL': config('DATABASE_URL'),
         'PGDATABASE': config('PGDATABASE'),
         'PGHOST': config('PGHOST'),
         'PGPASSWORD': config('PGPASSWORD'),
