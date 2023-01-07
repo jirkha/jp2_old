@@ -1,2 +1,2 @@
-release: python manage.py migrate --no-input
-web: gunicorn jp2.wsgi --log-file -
+release: env\Scripts\python manage.py migrate --no-input
+web: env\Scripts\gunicorn jp2.wsgi --log-file -
