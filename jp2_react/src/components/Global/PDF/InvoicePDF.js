@@ -1,5 +1,5 @@
 import React from "react";
-import { Page, Text, Image, Document, StyleSheet } from "@react-pdf/renderer";
+//import { Page, Text, Image, Document, StyleSheet } from "@react-pdf/renderer";
 import logo from "../../../assets/JP_logo_black.png";
 
 const styles = StyleSheet.create({
@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
 const InvoicePDF = () => {
   return (
     <>
-      <Document>
+      {/* <Document>
         <Page style={styles.body}>
           <Text style={styles.header} fixed></Text>
           <Image style={styles.image} src={logo} />
@@ -57,7 +57,7 @@ const InvoicePDF = () => {
             }
           />
         </Page>
-      </Document>
+      </Document> */}
     </>
   );
 };

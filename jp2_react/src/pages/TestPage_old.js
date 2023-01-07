@@ -12,7 +12,7 @@ import { getMaterial } from "../components/Store/Features/Material/materialSlice
 import { useDispatch, useSelector } from "react-redux";
 import {default as A} from "../components/Product/AddProductMultistepForm";
 import InvoicePDF from "../components/Global/PDF/InvoicePDF";
-import { PDFDownloadLink } from "@react-pdf/renderer";
+//import { PDFDownloadLink } from "@react-pdf/renderer";
 import GooglePlacesAutocomplete from "react-google-places-autocomplete";
 
 export default function Tags() {
@@ -175,7 +175,7 @@ export default function Tags() {
 
       {/* <InvoicePDF /> */}
       <div className="App">
-        <PDFDownloadLink document={<InvoicePDF />} filename="FORM">
+        {/* <PDFDownloadLink document={<InvoicePDF />} filename="FORM">
           {({ loading }) =>
             loading ? (
               <button>Loading Document...</button>
@@ -183,7 +183,7 @@ export default function Tags() {
               <button>Download</button>
             )
           }
-        </PDFDownloadLink>
+        </PDFDownloadLink> */}
         {/* <PDFFile /> */}
       </div>
     </>
