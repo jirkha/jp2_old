@@ -227,10 +227,13 @@ export default function NavbarJP() {
             <ListItem key={item.name}>
               <Link
                 //className={styles.link}
+                component="button"
+                key={item.name}
                 color="textPrimary"
                 variant="button"
-                underline="none"
+                underline="hover"
                 href={item.href}
+                onClick={() => navigate(item.href)}
               >
                 {item.name}
               </Link>
