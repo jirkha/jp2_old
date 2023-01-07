@@ -125,21 +125,21 @@ WSGI_APPLICATION = 'jp2.wsgi.application'
 #         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
-# DATABASES = {
-#     'default': {
-#         'DATABASE_URL': config('PASSWORD'),
-#         'PGDATABASE': config('PGDATABASE'),
-#         'PGHOST': config('PGHOST'),
-#         'PGPASSWORD': config('PGPASSWORD'),
-#         'PGPORT': config('PGPORT'),
-#         'PGUSER': config('PGUSER'),
-#     }
-# }
-DATABASE_URL = "postgresql://postgres:hShn09jaD4Vu9OeviqJD@containers-us-west-136.railway.app:6096/railway"
-#DATABASE_URL = config('DATABASE_URL')
 DATABASES = {
-    "default": dj_database_url.config(default=DATABASE_URL, conn_max_age=1800),
+    'default': {
+        'DATABASE_URL': config('PASSWORD'),
+        'PGDATABASE': config('PGDATABASE'),
+        'PGHOST': config('PGHOST'),
+        'PGPASSWORD': config('PGPASSWORD'),
+        'PGPORT': config('PGPORT'),
+        'PGUSER': config('PGUSER'),
+    }
 }
+# DATABASE_URL = "postgresql://postgres:hShn09jaD4Vu9OeviqJD@containers-us-west-136.railway.app:6096/railway"
+# #DATABASE_URL = config('DATABASE_URL')
+# DATABASES = {
+#     "default": dj_database_url.config(default=DATABASE_URL, conn_max_age=1800),
+# }
 
 
 # Password validation
