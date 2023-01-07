@@ -20,7 +20,7 @@ def main():
     execute_from_command_line(sys.argv)
 
 
-runserver.default_port = config('PORT')
+#runserver.default_port = config('PORT')
 
 if __name__ == '__main__':
     main()

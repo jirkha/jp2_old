@@ -135,7 +135,8 @@ WSGI_APPLICATION = 'jp2.wsgi.application'
 #         'PGUSER': config('PGUSER'),
 #     }
 # }
-DATABASE_URL = config('DATABASE_URL')
+DATABASE_URL = "postgresql://postgres:hShn09jaD4Vu9OeviqJD@containers-us-west-136.railway.app:6096/railway"
+#DATABASE_URL = config('DATABASE_URL')
 DATABASES = {
     "default": dj_database_url.config(default=DATABASE_URL, conn_max_age=1800),
 }
