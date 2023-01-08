@@ -128,14 +128,14 @@ class YearlySalesView(APIView):
         ### uloží všechny roky, ve kterých se uskutečnila transakce a přiřadí k nim tržby
         qy = Transaction.objects.values(
             'day_of_sale__year').annotate(amount=Sum('sum_sales')).order_by('-day_of_sale__year')
+        id = 0
         ### ověří, zda existuje nějaká uskutečněná transakce
-        if len(qy) > 0:
-            id = 0
+        if len(qy) > 0:            
             ### prochází jednotlivé roky a přiřadí k nim položku "id" pro účely React Selectu
             for item in qy:
                 #print("item",item)
                 item["id"] = id
-                id=+1
+                id+=1
                 ### přejmenuje položky "day_of_sale__year" na "name" pro [účely React Select]
                 item['name'] = item.pop('day_of_sale__year')
         print("qy", qy)

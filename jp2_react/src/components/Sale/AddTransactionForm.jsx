@@ -88,7 +88,7 @@ useEffect(() => {
     product: editedTransaction?.product?.id ?? "",
     discount_increase: editedTransaction?.discount_increase ?? "0",
     quantity_of_product: editedTransaction?.quantity_of_product ?? 1,
-    difference_price: editedTransaction?.difference_price ?? 0,
+    difference_price: editedTransaction?.difference_price ?? "",
     price_variant: editedTransaction?.price_variant ?? "Kč",
     brand: editedTransaction?.brand ?? true,
     note: editedTransaction?.note ?? "",

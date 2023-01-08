@@ -7,9 +7,13 @@ import { Button } from "@mui/material";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import { useDispatch } from "react-redux";
 import { getMaterial } from "../../Store/Features/Material/materialSlice";
+import { getMaterialType } from "../../Store/Features/Material/materialTypeSlice";
+import { getSale } from "../../Store/Features/Products/saleSlice";
+import { getSaleType } from "../../Store/Features/Products/saleTypeSlice";
 import { getStorage } from "../../Store/Features/Material/storageSlice";
 import { getRemoval } from "../../Store/Features/Material/removalSlice";
 import { getProduct } from "../../Store/Features/Products/productSlice";
+import { getProductType } from "../../Store/Features/Products/productTypeSlice";
 import { getTransaction } from "../../Store/Features/Products/transactionSlice";
 
 export default function DeleteColumns(props) {
@@ -35,6 +39,7 @@ export default function DeleteColumns(props) {
     .then(() => {
       console.log("Item Deleted!");
       dispatch(getMaterial());
+      dispatch(getMaterialType());
       navigate("/material");
     })
     .catch((err) => console.log(err));
@@ -60,6 +65,7 @@ export default function DeleteColumns(props) {
       .then(() => {
         console.log("Product Deleted!");
         dispatch(getProduct());
+        dispatch(getProductType());
         navigate("/product");
       })
       .catch((err) => console.log(err));
@@ -69,6 +75,15 @@ export default function DeleteColumns(props) {
         console.log("Transaction Deleted!");
         dispatch(getTransaction());
         navigate("/transaction");
+      })
+      .catch((err) => console.log(err));
+  } else if (props.typeTable === "sale") {
+    Axios.delete(`/api/sale_delete/${id}`)
+      .then(() => {
+        console.log("Sale Deleted!");
+        dispatch(getSale());
+        dispatch(getSaleType());
+        navigate("/sale");
       })
       .catch((err) => console.log(err));
   } else {

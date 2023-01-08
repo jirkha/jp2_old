@@ -487,6 +487,9 @@ def product_made_patch(response, pk):
         product.made += int(data['made'])
         product.stocked += int(data['made'])
     if data['variant'] == "-":
+        if product.made - product.sold < int(data['made']):
+            return HttpResponseBadRequest("Snížení množství produktů není možné. Vyrobené množstcí by bylo nižší než prodané. Upravte množství prodaných výrobků.")
+        
         product.made -= int(data['made'])
         product.stocked -= int(data['made'])
     
@@ -534,8 +537,7 @@ def product_item_delete(response, pk):
 
 @api_view(['GET'])
 def list_product(response):
-    p = Product.objects.all().order_by("name")
-    p_ser = ProductSerializer(p, many=True)
+
     
     ### vypočte, kolik bylo prodáno ks jednotlivých výrobků (z uskutečněných transakcí) a kolik jich je aktuálně skladem ###
     id_p = Product.objects.values('id')
@@ -558,9 +560,13 @@ def list_product(response):
                 ### od vyrobeného množství daného výrobku odečte prodané množství =>výsledkem je množství skladem
                 pr1.stocked = pr1.made - z['sum']
                 pr1.save(update_fields=["sold", "stocked"])
-        ### větev "else" je pro případ, kdy k danému produktu není přiřazena žádná transakce a pouze se uloží množství skladem
+        ### větev "else" je pro případ, kdy k danému produktu není přiřazena žádná transakce
         else:
-            pr1.save(update_fields=["stocked"])
+            pr1.sold = 0
+            pr1.save(update_fields=["sold", "stocked"])
+    
+    p = Product.objects.all().order_by("name")
+    p_ser = ProductSerializer(p, many=True)
             
     return Response(p_ser.data)
 
@@ -721,10 +727,13 @@ def transaction_add(request):
     if product.stocked < int(data['quantity_of_product']):
         return HttpResponseBadRequest("Nedostatek naskladněného produktu pro provedení transakce")
     
-    if data['price_variant'] == "%":
-        difference_price = float(data['difference_price']) * 0.01 * standard_price
+    if data['difference_price'] == "":
+        difference_price = 0
     else:
         difference_price = float(data['difference_price'])
+    
+    if data['price_variant'] == "%":
+        difference_price = float(difference_price) * 0.01 * standard_price   
     
     if data['discount_increase'] == "-":
         real_price = standard_price - difference_price
@@ -788,15 +797,21 @@ def transaction_update(response, pk):
     
     product = Product.objects.get(id=data['product'])
     standard_price = product.price
-
-    if product.stocked < int(data['quantity_of_product']):
+    
+    print("transaction.quantity_of_product", transaction.quantity_of_product)
+    stocked_before = int(transaction.quantity_of_product) + \
+        int(product.stocked)
+    if stocked_before < int(data['quantity_of_product']):
         return HttpResponseBadRequest("Nedostatek naskladněného produktu pro provedení transakce")
 
-    if data['price_variant'] == "%":
-        difference_price = float(
-            data['difference_price']) * 0.01 * standard_price
+    if data['difference_price'] == "":
+        difference_price = 0
     else:
         difference_price = float(data['difference_price'])
+        
+    if data['price_variant'] == "%":
+        difference_price = float(
+            difference_price) * 0.01 * standard_price
 
     if data['discount_increase'] == "-":
         real_price = standard_price - difference_price

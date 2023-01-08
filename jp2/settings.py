@@ -30,10 +30,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-wr^xw(hxn*04prtsp)wkns!4=zbl%9&78f_4tmg#142(%nw5yw'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG')
 
 ALLOWED_HOSTS = ["*"]
 
@@ -101,8 +101,6 @@ TEMPLATES = [
         },
     },
 ]
-print("DIRS", os.path.join(BASE_DIR, 'jp2_react/build'))
-print("BASE_DIR", BASE_DIR)
 
 WSGI_APPLICATION = 'jp2.wsgi.application'
 
@@ -111,20 +109,11 @@ WSGI_APPLICATION = 'jp2.wsgi.application'
 
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'dftu6ju984n8br',
-#         'USER': 'pahgkhpxphzfbq',
-#         'PASSWORD': config('PASSWORD'),
-#         'HOST': 'ec2-34-242-8-97.eu-west-1.compute.amazonaws.com',
-#         'PORT': '5432'
-#     }
-# }
-# DATABASES = {
-#     'default': {
 #         'ENGINE': 'django.db.backends.sqlite3',
 #         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
+
 DATABASES = {
     'default': {
         'DATABASE_URL': config('DATABASE_URL'),
@@ -135,7 +124,7 @@ DATABASES = {
         'PGUSER': config('PGUSER'),
     }
 }
-# DATABASE_URL = "postgresql://postgres:hShn09jaD4Vu9OeviqJD@containers-us-west-136.railway.app:6096/railway"
+
 # #DATABASE_URL = config('DATABASE_URL')
 # DATABASES = {
 #     "default": dj_database_url.config(default=DATABASE_URL, conn_max_age=1800),
@@ -179,7 +168,7 @@ USE_TZ = True
 # PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-#STATIC_URL = '/static/'
+STATIC_URL = '/staticfiles/' ### zakomentovat
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
@@ -241,4 +230,4 @@ DEBUG_TOOLBAR_PANELS = [
     'debug_toolbar.panels.profiling.ProfilingPanel',
 ]
 
-django_heroku.settings(locals())
+# django_heroku.settings(locals())

@@ -8,11 +8,11 @@ export const TRANSACTION_COLUMNS = [
     Footer: "ID",
     accessor: "id",
     disableFilters: true,
-    Cell: ({ row }) => (
-      <Link to={`/transaction_detail/${row.original.id}`}>
-        {row.original.id}
-      </Link>
-    ),
+    // Cell: ({ row }) => (
+    //   <Link to={`/transaction_detail/${row.original.id}`}>
+    //     {row.original.id}
+    //   </Link>
+    // ),
   },
   {
     Header: "Uskutečněno ",

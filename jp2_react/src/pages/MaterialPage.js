@@ -137,8 +137,10 @@ const MaterialPage = () => {
               </Typography>
             </Grid>
             <Grid item xs={9}>
-              <Typography variant="subtitle1">
-                <a href={material?.link}>{material?.link}</a>
+              <Typography variant="subtitle1" component="div">
+                <a href={`https://${material?.link}`} target="_blank">
+                  {material?.link}
+                </a>
               </Typography>
             </Grid>
             <Divider variant="middle" style={{ width: "80%" }} />

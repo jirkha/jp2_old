@@ -12,12 +12,13 @@ import {
 } from "recharts";
 import { Box } from "@mui/material";
 
-function DayStatistic(props) {
-    // let [data, setData] = useState([]);
+function DayStatistic({data}) {
+    const [dayData, setDayData] = useState([]);
 
-    // useEffect(() => {
-    //   getData();
-    //     }, []);
+    useEffect(() => {
+      //console.log("data", data);
+      setDayData(data.reverse());
+    }, [data, dayData]);
 
     // let getData = async () => {
     // Axios.get('/api/daily_sales/')
@@ -26,20 +27,31 @@ function DayStatistic(props) {
     //     //console.log("data: ", res.data);
     // })};
 
+    const dateFormater = (date) => {
+      //console.log("date", date);
+      let objectDate = new Date(date);
+      let day = objectDate.getDate();
+      let month = objectDate.getMonth()+1;
+      let year = objectDate.getFullYear();
+      return `${day}.${month}.${year}`
+    }
+
  
 return (
   <Box>
-    <AreaChart width={700} height={500} data={props.data}>
+    <AreaChart width={700} height={500} data={dayData}>
       <Area
+        name="Tržby [Kč]"
         type="monotone"
         dataKey="tržby"
         stroke="#2196F3"
         fill="#2196F3"
         strokeWidth={3}
       />
-      <CartesianGrid stroke="#ccc" />
-      <XAxis dataKey="day"></XAxis>
-      <YAxis />
+      {/* <CartesianGrid stroke="#ccc" /> */}
+      <CartesianGrid strokeDasharray="3 3" />
+      <XAxis dataKey="day" tickFormatter={(t) => dateFormater(t)}></XAxis>
+      <YAxis tickFormatter={(t) => `${t} Kč`} />
       <Tooltip />
       <Legend />
     </AreaChart>

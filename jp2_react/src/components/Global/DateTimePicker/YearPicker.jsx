@@ -16,7 +16,7 @@ const YearPicker = (props) => {
     const {setDataMonth} = props;
     
     const handleOnChange = (event) => {
-        //console.log("handleOnChange", event);
+        console.log("handleOnChange", event);
         const found = dataYear.find(element => element.id === event);
         console.log("fromEntries", found.name);
         Axios.post('/api/monthly_sales/', {

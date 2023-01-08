@@ -182,6 +182,12 @@ const AddSaleForm = (props) => {
                 alignItems="flex-start"
               >
                 <Grid item xs={12}>
+                  <GooglePlaces
+                    listAdress={listAdress}
+                    setListAdress={setListAdress}
+                  />
+                </Grid>
+                <Grid item xs={12}>
                   <Typography
                     variant="subtitle2"
                     //color="textPrimary"
@@ -256,12 +262,6 @@ const AddSaleForm = (props) => {
                   </Typography>
                 </Grid>
 
-                <Grid item xs={12}>
-                  <GooglePlaces
-                    listAdress={listAdress}
-                    setListAdress={setListAdress}
-                  />
-                </Grid>
                 <Grid item xs={8}>
                   <TextField name="route" label="Ulice" variant="outlined" />
                 </Grid>

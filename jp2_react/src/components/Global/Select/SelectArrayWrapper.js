@@ -10,7 +10,7 @@ const SelectArrayWrapper = ({ name, options, ...otherProps }) => {
   const handleChange = (evt) => {
     const { value } = evt.target;
     // console.log("name: ", name);
-    // console.log("value: ", value);
+    console.log("value: ", value);
     // console.log("...otherProps: ", otherProps['handleOnChange']);
     setFieldValue(name, value);
     {otherProps["handleOnChange"] && handleOnChange(value)} //ověří, zda je SelectArrayWrapper vyvolán komponentou YearPicker
