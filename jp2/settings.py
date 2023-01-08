@@ -168,7 +168,7 @@ USE_TZ = True
 # PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-#STATIC_URL = '/staticfiles/' ### zakomentovat
+#STATIC_URL = '/static/' ### zakomentovat
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
@@ -230,4 +230,4 @@ DEBUG_TOOLBAR_PANELS = [
     'debug_toolbar.panels.profiling.ProfilingPanel',
 ]
 
-# django_heroku.settings(locals())
+django_heroku.settings(locals())
