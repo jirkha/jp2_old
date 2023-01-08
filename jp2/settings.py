@@ -114,21 +114,21 @@ WSGI_APPLICATION = 'jp2.wsgi.application'
 #     }
 # }
 
-# DATABASES = {
-#     'default': {
-#         'DATABASE_URL': config('DATABASE_URL'),
-#         'PGDATABASE': config('PGDATABASE'),
-#         'PGHOST': config('PGHOST'),
-#         'PGPASSWORD': config('PGPASSWORD'),
-#         'PGPORT': config('PGPORT'),
-#         'PGUSER': config('PGUSER'),
-#     }
-# }
-
-DATABASE_URL = config('DATABASE_URL')
 DATABASES = {
-    "default": dj_database_url.config(default=DATABASE_URL, conn_max_age=1800),
+    'default': {
+        'DATABASE_URL': config('DATABASE_URL'),
+        'PGDATABASE': config('PGDATABASE'),
+        'PGHOST': config('PGHOST'),
+        'PGPASSWORD': config('PGPASSWORD'),
+        'PGPORT': config('PGPORT'),
+        'PGUSER': config('PGUSER'),
+    }
 }
+
+# DATABASE_URL = config('DATABASE_URL')
+# DATABASES = {
+#     "default": dj_database_url.config(default=DATABASE_URL, conn_max_age=1800),
+# }
 
 
 # Password validation
@@ -168,7 +168,7 @@ USE_TZ = True
 # PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-STATIC_URL = '/staticfiles/' ### zakomentovat
+#STATIC_URL = '/staticfiles/' ### zakomentovat
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
